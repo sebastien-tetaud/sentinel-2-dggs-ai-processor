@@ -26,7 +26,7 @@ TRAINING:
     optim: Adam
     batch_size: 8
     augmentation: False
-    n_epoch: 2
+    n_epoch: 100
     num_workers : 8
     save_strategy: metric # loss/ metric
     save_metric: sam #ssim, psnr, sam, rmse
