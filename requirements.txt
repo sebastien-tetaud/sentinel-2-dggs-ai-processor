@@ -45,9 +45,9 @@ sentinelsat==1.2.1
 sparse==0.16.0
 tomli==2.0.1
 torch==2.7.1
-torchmetric==1.7.4
+torchmetrics==1.7.4
 torchvision==0.22.1
 wandb==0.21.0
-xarray==2025.3.1
+xarray==2024.05.0
 zarr==3.0.6
 zstandard==0.23.0

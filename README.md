@@ -13,8 +13,8 @@ cd sentinel-2-dggs-ai-processor
 2. Create and activate a conda environment:
 
 ```bash
-conda create -n dggs python==3.13.2
-conda dggs
+conda create -n eopf python==3.11.7
+conda eopf
 ```
 
 3. Install the required dependencies:
