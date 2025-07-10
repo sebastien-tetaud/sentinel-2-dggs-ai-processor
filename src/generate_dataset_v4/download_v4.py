@@ -140,7 +140,7 @@ def download_sentinel_data(df_input, df_output, base_dir):
 if __name__ == "__main__":
     load_dotenv()
     version = "V4"
-    DATASET_DIR = f"/mnt/disk/dataset/sentinel-ai-processor/{version}"
+    DATASET_DIR = f"/mnt/disk/dataset/sentinel-ai-processor/{version}/"
     TRAIN_DIR = f"{DATASET_DIR}/train/"
     VAL_DIR = f"{DATASET_DIR}/val/"
     TEST_DIR = f"{DATASET_DIR}/test/"
