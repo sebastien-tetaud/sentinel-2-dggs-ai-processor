@@ -13,7 +13,7 @@ cd sentinel-2-dggs-ai-processor
 2. Create and activate a conda environment:
 
 ```bash
-conda create -n ai_processor python==3.13.2
+conda create -n dggs python==3.13.2
 conda dggs
 ```
 
