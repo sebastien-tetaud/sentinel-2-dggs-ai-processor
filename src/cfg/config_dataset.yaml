@@ -1,0 +1,37 @@
+# S3 Endpoint Configuration
+endpoint_url: 'https://eodata.dataspace.copernicus.eu'
+endpoint_stac: 'https://stac.dataspace.copernicus.eu/v1/'
+bucket_name: 'eodata'
+
+# Dataset Configuration
+dataset_version: 'V4'
+base_dir: '/mnt/disk/dataset/sentinel-ai-processor'
+bands:
+  - 'B02'
+  # - 'B03'
+  # - 'B04'
+
+# Query Configuration
+query:
+  bbox:
+    - 3.2833
+    - 45.3833
+    - 11.2
+    - 50.1833
+
+  start_date: '2025-02-01'
+  end_date: '2025-02-15'
+  # start_date: '2025-01-01'
+  # end_date: '2025-01-15'
+  max_items: 1000
+  max_cloud_cover: 100
+
+# Download Configuration
+download:
+  sample_size: 10  # Set to null for all samples
+  resize: false
+  resize_target: 1830
+  l1c_resolution: 10
+  l2a_resolution: 10
+  max_attempts: 10
+  retry_delay: 20

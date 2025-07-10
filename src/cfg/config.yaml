@@ -1,0 +1,37 @@
+DATASET:
+  version: "V3"
+  base_dir: "/mnt/disk/dataset/sentinel-ai-processor"
+  bands : ["B02", "B03", "B04"]
+
+ENDPOINTS:
+  url: "ttps://eodata.dataspace.copernicus.eu"
+  stac: "https://stac.dataspace.copernicus.eu/v1/"
+  bucket_name: "eodata"
+
+MODEL:
+  model_name: "Unet"
+  encoder_name: "timm-efficientnet-b2"
+  encoder_weights: "imagenet"
+  in_channel: 3
+  out_channels: 3
+  activation: relu
+
+TRAINING:
+    seed: 42
+    resize : 1024
+    learning_rate: 1e-3
+    scheduler: True
+    scheduler_type: ReduceLROnPlateau
+    factor: 0.5
+    optim: Adam
+    batch_size: 8
+    augmentation: False
+    n_epoch: 100
+    num_workers : 8
+    save_strategy: metric # loss/ metric
+    save_metric: sam #ssim, psnr, sam, rmse
+    save_mode: min  #min, max
+
+WANDB:
+    track: True
+    project_name: sentinel2-ai-processor

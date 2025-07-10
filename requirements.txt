@@ -1,0 +1,194 @@
+albumentations
+aiohttp==3.11.16
+backports.tarfile==1.2.0
+bokeh==3.7.2
+boto3==1.37.26
+bottleneck==1.4.2
+brotli==1.1.0
+cartopy==0.24.1
+cffi==1.17.1
+conflator==0.1.7
+crc32c==2.7.1
+distributed==2025.3.0
+dotenv==0.9.9
+exceptiongroup==1.2.2
+flox==0.10.1
+folium==0.19.5
+geodatasets==2024.8.0
+geopandas==1.0.1
+gradio==5.23.3
+h2==4.2.0
+h5netcdf==1.6.1
+importlib-metadata==8.6.1
+ipykernel==6.29.5
+isort==6.0.1
+jaraco.collections==5.1.0
+lxml==5.3.1
+lz4==4.4.4
+nbformat==5.10.4
+nc-time-axis==1.4.1
+netcdf4==1.7.2
+numbagg==0.9.0
+opt-einsum==3.4.0
+plotly
+pickleshare==0.7.5
+pyarrow==19.0.1
+pysocks==1.7.1
+pystac-client==0.8.6
+rasterio==1.4.3
+seaborn==0.13.2
+sentinelsat==1.2.1
+sparse==0.16.0
+tomli==2.0.1
+xarray==2025.3.1
+zarr==3.0.6
+zstandard==0.23.0
+# affine==2.4.0 # Installed as dependency for rasterio
+# aiofiles==23.2.1 # Installed as dependency for gradio
+# aiohappyeyeballs==2.6.1 # Installed as dependency for aiohttp
+# aiosignal==1.3.2 # Installed as dependency for aiohttp
+# annotated-types==0.7.0 # Installed as dependency for pydantic
+# anyio==4.9.0 # Installed as dependency for gradio, httpx, starlette
+# argparse==1.4.0 # Installed as dependency for conflator
+# asttokens==3.0.0 # Installed as dependency for stack-data
+# attrs==25.3.0 # Installed as dependency for aiohttp, jsonschema, rasterio, referencing
+# audioop-lts==0.2.1 # Installed as dependency for gradio
+# autocommand==2.2.2 # Installed as dependency for jaraco.text
+# botocore==1.37.26 # Installed as dependency for boto3, s3transfer
+# branca==0.8.1 # Installed as dependency for folium
+# certifi==2025.1.31 # Installed as dependency for httpcore, httpx, netcdf4, pyogrio, pyproj, rasterio, requests
+# cftime==1.6.4.post1 # Installed as dependency for nc-time-axis, netcdf4
+# charset-normalizer==3.4.1 # Installed as dependency for requests
+# click==8.1.8 # Installed as dependency for click-plugins, cligj, dask, distributed, geomet, rasterio, sentinelsat, typer, uvicorn
+# click-plugins==1.1.1 # Installed as dependency for rasterio
+# cligj==0.7.2 # Installed as dependency for rasterio
+# cloudpickle==3.1.1 # Installed as dependency for dask, distributed
+# comm==0.2.2 # Installed as dependency for ipykernel
+# contourpy==1.3.1 # Installed as dependency for bokeh, matplotlib
+# cycler==0.12.1 # Installed as dependency for matplotlib
+# dask==2025.3.0 # Installed as dependency for distributed
+# debugpy==1.8.13 # Installed as dependency for ipykernel
+# decorator==5.2.1 # Installed as dependency for ipython
+# deprecated==1.2.18 # Installed as dependency for numcodecs
+# donfig==0.8.1.post1 # Installed as dependency for zarr
+# executing==2.1.0 # Installed as dependency for stack-data
+# fastapi==0.115.12 # Installed as dependency for gradio
+# fastjsonschema==2.21.1 # Installed as dependency for nbformat
+# ffmpy==0.5.0 # Installed as dependency for gradio
+# filelock==3.18.0 # Installed as dependency for huggingface-hub
+# fonttools==4.56.0 # Installed as dependency for matplotlib
+# frozenlist==1.5.0 # Installed as dependency for aiohttp, aiosignal
+# fsspec==2025.3.2 # Installed as dependency for dask, gradio-client, huggingface-hub
+# geojson==3.2.0 # Installed as dependency for sentinelsat
+# geomet==1.1.0 # Installed as dependency for sentinelsat
+# gradio-client==1.8.0 # Installed as dependency for gradio
+# groovy==0.1.2 # Installed as dependency for gradio
+# h11==0.14.0 # Installed as dependency for httpcore, uvicorn
+# h5py==3.13.0 # Installed as dependency for h5netcdf
+# hpack==4.1.0 # Installed as dependency for h2
+# html2text==2024.2.26 # Installed as dependency for sentinelsat
+# httpcore==1.0.7 # Installed as dependency for httpx
+# httpx==0.28.1 # Installed as dependency for gradio, gradio-client, safehttpx
+# huggingface-hub==0.30.1 # Installed as dependency for gradio, gradio-client
+# hyperframe==6.1.0 # Installed as dependency for h2
+# idna==3.10 # Installed as dependency for anyio, httpx, requests, yarl
+# inflect==7.3.1 # Installed as dependency for jaraco.text
+# iniconfig==2.1.0 # Installed as dependency for pytest
+# ipython==9.0.2 # Installed as dependency for ipykernel
+# ipython-pygments-lexers==1.1.1 # Installed as dependency for ipython
+# jaraco.context==5.3.0 # Installed as dependency for jaraco.text
+# jaraco.functools==4.0.1 # Installed as dependency for jaraco.text
+# jaraco.text==3.12.1 # Installed as dependency for jaraco.collections
+# jedi==0.19.2 # Installed as dependency for ipython
+# jinja2==3.1.6 # Installed as dependency for bokeh, branca, distributed, folium, gradio
+# jmespath==1.0.1 # Installed as dependency for boto3, botocore
+# jsonschema==4.23.0 # Installed as dependency for nbformat
+# jsonschema-specifications==2024.10.1 # Installed as dependency for jsonschema
+# jupyter-client==8.6.3 # Installed as dependency for ipykernel
+# jupyter-core==5.7.2 # Installed as dependency for ipykernel, jupyter-client, nbformat
+# kiwisolver==1.4.8 # Installed as dependency for matplotlib
+# llvmlite==0.44.0 # Installed as dependency for numba
+# locket==1.0.0 # Installed as dependency for distributed, partd
+# markdown-it-py==3.0.0 # Installed as dependency for rich
+# markupsafe==3.0.2 # Installed as dependency for gradio, jinja2
+# matplotlib==3.10.1 # Installed as dependency for cartopy, nc-time-axis, seaborn
+# matplotlib-inline==0.1.7 # Installed as dependency for ipykernel, ipython
+# mdurl==0.1.2 # Installed as dependency for markdown-it-py
+# more-itertools==10.3.0 # Installed as dependency for inflect, jaraco.functools, jaraco.text
+# msgpack==1.1.0 # Installed as dependency for distributed
+# multidict==6.2.0 # Installed as dependency for aiohttp, yarl
+# narwhals==1.33.0 # Installed as dependency for bokeh
+# nest-asyncio==1.6.0 # Installed as dependency for ipykernel
+# numba==0.61.0 # Installed as dependency for numbagg, sparse
+# numcodecs==0.15.1 # Installed as dependency for zarr
+# numpy==2.1.3 # Installed as dependency for bokeh, bottleneck, cartopy, cftime, contourpy, flox, folium, geopandas, gradio, h5py, matplotlib, nc-time-axis, netcdf4, numba, numbagg, numcodecs, numpy-groupies, pandas, pyogrio, rasterio, scipy, seaborn, shapely, sparse, xarray, zarr
+# numpy-groupies==0.11.2 # Installed as dependency for flox
+# orjson==3.10.16 # Installed as dependency for gradio
+# packaging==24.2 # Installed as dependency for bokeh, cartopy, dask, distributed, flox, geopandas, gradio, gradio-client, h5netcdf, huggingface-hub, ipykernel, matplotlib, pooch, pyogrio, pytest, xarray, zarr
+# pandas==2.2.3 # Installed as dependency for bokeh, flox, geopandas, gradio, seaborn, xarray
+# parso==0.8.4 # Installed as dependency for jedi
+# partd==1.4.2 # Installed as dependency for dask
+# pexpect==4.9.0 # Installed as dependency for ipython
+# pillow==11.1.0 # Installed as dependency for bokeh, gradio, matplotlib
+# platformdirs==4.3.7 # Installed as dependency for jupyter-core, pooch
+# pluggy==1.5.0 # Installed as dependency for pytest
+# pooch==1.8.2 # Installed as dependency for geodatasets
+# prompt-toolkit==3.0.50 # Installed as dependency for ipython
+# propcache==0.3.1 # Installed as dependency for aiohttp, yarl
+# psutil==7.0.0 # Installed as dependency for distributed, ipykernel
+# ptyprocess==0.7.0 # Installed as dependency for pexpect
+# pure-eval==0.2.3 # Installed as dependency for stack-data
+# pycparser==2.22 # Installed as dependency for cffi
+# pydantic==2.11.1 # Installed as dependency for conflator, fastapi, gradio
+# pydantic-core==2.33.0 # Installed as dependency for pydantic
+# pydub==0.25.1 # Installed as dependency for gradio
+# pygments==2.19.1 # Installed as dependency for ipython, ipython-pygments-lexers, rich
+# pyogrio==0.10.0 # Installed as dependency for geopandas
+# pyparsing==3.2.3 # Installed as dependency for matplotlib, rasterio
+# pyproj==3.7.1 # Installed as dependency for cartopy, geopandas
+# pyshp==2.3.1 # Installed as dependency for cartopy
+# pystac==1.12.2 # Installed as dependency for pystac-client
+# pytest==8.3.5 # Installed as dependency for conflator
+# python-dateutil==2.9.0.post0 # Installed as dependency for botocore, jupyter-client, matplotlib, pandas, pystac, pystac-client
+# python-dotenv==1.1.0 # Installed as dependency for dotenv
+# python-multipart==0.0.20 # Installed as dependency for gradio
+# pytz==2025.2 # Installed as dependency for pandas
+# pyyaml==6.0.2 # Installed as dependency for bokeh, conflator, dask, distributed, donfig, gradio, huggingface-hub
+# pyzmq==26.3.0 # Installed as dependency for ipykernel, jupyter-client
+# referencing==0.36.2 # Installed as dependency for jsonschema, jsonschema-specifications
+# requests==2.32.3 # Installed as dependency for folium, huggingface-hub, pooch, pystac-client, sentinelsat
+# rich==14.0.0 # Installed as dependency for rich-argparse, typer
+# rich-argparse==1.7.0 # Installed as dependency for conflator
+# rpds-py==0.24.0 # Installed as dependency for jsonschema, referencing
+# ruff==0.11.2 # Installed as dependency for gradio
+# s3transfer==0.11.4 # Installed as dependency for boto3
+# safehttpx==0.1.6 # Installed as dependency for gradio
+# scipy==1.15.2 # Installed as dependency for flox
+# semantic-version==2.10.0 # Installed as dependency for gradio
+# shapely==2.0.7 # Installed as dependency for cartopy, geopandas
+# shellingham==1.5.4 # Installed as dependency for typer
+# six==1.17.0 # Installed as dependency for python-dateutil
+# sniffio==1.3.1 # Installed as dependency for anyio
+# sortedcontainers==2.4.0 # Installed as dependency for distributed
+# stack-data==0.6.3 # Installed as dependency for ipython
+# starlette==0.46.1 # Installed as dependency for fastapi, gradio
+# tblib==3.1.0 # Installed as dependency for distributed
+# tomlkit==0.13.2 # Installed as dependency for gradio
+# toolz==1.0.0 # Installed as dependency for dask, distributed, flox, partd
+# tornado==6.4.2 # Installed as dependency for bokeh, distributed, ipykernel, jupyter-client
+# tqdm==4.67.1 # Installed as dependency for huggingface-hub, sentinelsat
+# traitlets==5.14.3 # Installed as dependency for comm, ipykernel, ipython, jupyter-client, jupyter-core, matplotlib-inline, nbformat
+# typeguard==4.3.0 # Installed as dependency for inflect
+# typer==0.15.2 # Installed as dependency for gradio
+# typing-extensions==4.13.0 # Installed as dependency for fastapi, gradio, gradio-client, huggingface-hub, pydantic, pydantic-core, typeguard, typer, typing-inspection, zarr
+# typing-inspection==0.4.0 # Installed as dependency for pydantic
+# tzdata==2025.2 # Installed as dependency for pandas
+# urllib3==2.3.0 # Installed as dependency for botocore, distributed, requests
+# uvicorn==0.34.0 # Installed as dependency for gradio
+# wcwidth==0.2.13 # Installed as dependency for prompt-toolkit
+# websockets==15.0.1 # Installed as dependency for gradio-client
+# wrapt==1.17.2 # Installed as dependency for deprecated
+# xyzservices==2025.1.0 # Installed as dependency for bokeh, folium
+# yarl==1.18.3 # Installed as dependency for aiohttp
+# zict==3.0.0 # Installed as dependency for distributed
+# zipp==3.21.0 # Installed as dependency for importlib-metadata
