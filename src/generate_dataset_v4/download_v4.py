@@ -10,6 +10,7 @@ from eopf.common.constants import OpeningMode
 from eopf.common.file_utils import AnyPath
 from eopf.store.convert import convert
 from datetime import datetime
+from sklearn.utils import shuffle
 
 
 def setup_logger(log_path, filename_prefix):
@@ -178,8 +179,24 @@ if __name__ == "__main__":
     df_val_input, df_val_output = prepare_paths(VAL_DIR)
     df_test_input, df_test_output = prepare_paths(TEST_DIR)
 
+    # Shuffle and reset index for training set
+    df_train_input, df_train_output = shuffle(df_train_input, df_train_output, random_state=42)
+    df_train_input = df_train_input.reset_index(drop=True)
+    df_train_output = df_train_output.reset_index(drop=True)
+
+    # Shuffle and reset index for validation set
+    df_val_input, df_val_output = shuffle(df_val_input, df_val_output, random_state=42)
+    df_val_input = df_val_input.reset_index(drop=True)
+    df_val_output = df_val_output.reset_index(drop=True)
+
+    # Shuffle and reset index for test set
+    df_test_input, df_test_output = shuffle(df_test_input, df_test_output, random_state=42)
+    df_test_input = df_test_input.reset_index(drop=True)
+    df_test_output = df_test_output.reset_index(drop=True)
+
+
     logger.info("Starting download process...")
-    download_sentinel_data(df_train_input[:140], df_train_output[:140], TRAIN_DIR)
-    download_sentinel_data(df_val_input[:40], df_val_output[:40], VAL_DIR)
-    download_sentinel_data(df_test_input[:20], df_test_output[:20], TEST_DIR)
+    download_sentinel_data(df_train_input[:70], df_train_output[:70], TRAIN_DIR)
+    download_sentinel_data(df_val_input[:20], df_val_output[:20], VAL_DIR)
+    download_sentinel_data(df_test_input[:10], df_test_output[:10], TEST_DIR)
     logger.success("All downloads completed!")
