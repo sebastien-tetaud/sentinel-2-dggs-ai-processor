@@ -83,11 +83,6 @@ def prepare_paths(path_dir):
     df_input = pd.read_csv(f"{path_dir}/input.csv")
     df_output = pd.read_csv(f"{path_dir}/target.csv")
 
-    df_input["path"] = df_input["Name"].apply(lambda x: os.path.join(path_dir, "input", os.path.basename(x).replace(".SAFE", "")))
-    df_output["path"] = df_output["Name"].apply(lambda x: os.path.join(path_dir, "target", os.path.basename(x).replace(".SAFE", "")))
-    df_input["S3Path"] = df_input["S3Path"].apply(lambda x: f"s3:/{x}" if not x.startswith("s3://") else x)
-    df_output["S3Path"] = df_output["S3Path"].apply(lambda x: f"s3:/{x}" if not x.startswith("s3://") else x)
-
     logger.info(f"Paths prepared: {len(df_input)} input files, {len(df_output)} target files.")
     return df_input, df_output
 
@@ -179,24 +174,9 @@ if __name__ == "__main__":
     df_val_input, df_val_output = prepare_paths(VAL_DIR)
     df_test_input, df_test_output = prepare_paths(TEST_DIR)
 
-    # Shuffle and reset index for training set
-    df_train_input, df_train_output = shuffle(df_train_input, df_train_output, random_state=42)
-    df_train_input = df_train_input.reset_index(drop=True)
-    df_train_output = df_train_output.reset_index(drop=True)
-
-    # Shuffle and reset index for validation set
-    df_val_input, df_val_output = shuffle(df_val_input, df_val_output, random_state=42)
-    df_val_input = df_val_input.reset_index(drop=True)
-    df_val_output = df_val_output.reset_index(drop=True)
-
-    # Shuffle and reset index for test set
-    df_test_input, df_test_output = shuffle(df_test_input, df_test_output, random_state=42)
-    df_test_input = df_test_input.reset_index(drop=True)
-    df_test_output = df_test_output.reset_index(drop=True)
-
 
     logger.info("Starting download process...")
-    download_sentinel_data(df_train_input[:70], df_train_output[:70], TRAIN_DIR)
-    download_sentinel_data(df_val_input[:20], df_val_output[:20], VAL_DIR)
-    download_sentinel_data(df_test_input[:10], df_test_output[:10], TEST_DIR)
+    download_sentinel_data(df_train_input, df_train_output, TRAIN_DIR)
+    download_sentinel_data(df_val_input, df_val_output, VAL_DIR)
+    download_sentinel_data(df_test_input, df_test_output, TEST_DIR)
     logger.success("All downloads completed!")
