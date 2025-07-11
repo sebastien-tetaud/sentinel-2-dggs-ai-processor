@@ -174,6 +174,10 @@ if __name__ == "__main__":
     df_val_input, df_val_output = prepare_paths(VAL_DIR)
     df_test_input, df_test_output = prepare_paths(TEST_DIR)
 
+    logger.info(f"Number train data: input ->  {len(df_train_input)} , target -> {len(df_train_output)} ")
+    logger.info(f"Number val data: input -> {len(df_val_input)} , target -> {len(df_val_output)} ")
+    logger.info(f"Number test data: input -> {len(df_test_input)} , target -> {len(df_test_output)} ")
+
 
     logger.info("Starting download process...")
     download_sentinel_data(df_train_input, df_train_output, TRAIN_DIR)
