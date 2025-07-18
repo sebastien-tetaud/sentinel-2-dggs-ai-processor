@@ -5,10 +5,10 @@ import numpy as np
 import xarray as xr
 import healpy as hp
 
-class RegionalSphericalConv(nn.Module):
+class SphericalConv(nn.Module):
     def __init__(self, available_cell_ids, level, in_channels, out_channels, bias=True, nest=True, stride=1):
         """Regional Spherical Convolutional layer for HEALPix data covering a specific area."""
-        super(RegionalSphericalConv, self).__init__()
+        super(SphericalConv, self).__init__()
 
         self.level = level
         self.NSIDE = 2 ** level
@@ -96,7 +96,7 @@ class SphericalConvBlock(nn.Module):
     def __init__(self, available_cell_ids, level, in_channels, out_channels, stride=1):
         super(SphericalConvBlock, self).__init__()
 
-        self.conv = RegionalSphericalConv(
+        self.conv = SphericalConv(
             available_cell_ids=available_cell_ids,
             level=level,
             in_channels=in_channels,
@@ -112,11 +112,11 @@ class SphericalConvBlock(nn.Module):
         x = self.relu(x)
         return x
 
-class SphericalDoubleConv(nn.Module):
+class SphericalDoubleConvBlock(nn.Module):
     """Double convolution block (Conv -> BN -> ReLU -> Conv -> BN -> ReLU)"""
 
     def __init__(self, available_cell_ids, level, in_channels, out_channels, stride=1):
-        super(SphericalDoubleConv, self).__init__()
+        super(SphericalDoubleConvBlock, self).__init__()
 
         # First conv with specified stride
         self.conv1 = SphericalConvBlock(
@@ -141,13 +141,15 @@ class SphericalDoubleConv(nn.Module):
         x = self.conv2(x)
         return x
 
-class SimpleSphericalModel(nn.Module):
-    """Simple model that just applies SphericalDoubleConv"""
+class Model(nn.Module):
+    """Simple model that just applies SphericalDoubleConv
+    TBD for a UNET later
+    """
 
     def __init__(self, available_cell_ids, level, in_channels, out_channels, stride=1):
-        super(SimpleSphericalModel, self).__init__()
+        super(Model, self).__init__()
 
-        self.double_conv = SphericalDoubleConv(
+        self.double_conv = SphericalDoubleConvBlock(
             available_cell_ids=available_cell_ids,
             level=level,
             in_channels=in_channels,
@@ -176,7 +178,7 @@ band_list = ['b02', 'b03', 'b04', 'b08']  # Your spectral bands
 in_channels = len(band_list)
 stride = 1
 
-model = SimpleSphericalModel(
+model = Model(
     available_cell_ids=available_cell_ids,
     level=level,
     in_channels=in_channels,
