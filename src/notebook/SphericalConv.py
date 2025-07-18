@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 import xarray as xr
 import healpy as hp
+import gc
 
 class SphericalConv(nn.Module):
     def __init__(self, available_cell_ids, level, in_channels, out_channels, bias=True, nest=True, stride=1):
@@ -160,6 +161,27 @@ class Model(nn.Module):
     def forward(self, x):
         return self.double_conv(x)
 
+# Memory management function
+def clear_memory():
+    """Clear GPU and CPU memory"""
+    # Delete common variables if they exist
+    vars_to_delete = ['model', 'x_tensor', 'output', 'x_multi_band', 'spectral_data']
+    for var in vars_to_delete:
+        if var in globals():
+            del globals()[var]
+
+    # Force garbage collection
+    gc.collect()
+
+    # Clear GPU cache
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+
+    print("Memory cleared")
+
+# Clear memory before starting
+clear_memory()
 
 # Check GPU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -213,5 +235,8 @@ x_tensor = x_tensor.to(device)
 
 # 6. Forward pass
 with torch.no_grad():
-    output = model(x_tensor)  # Fixed: was SphericalUNet(x_tensor)
-    print(f"Output tensor shape: {output.shape}")  # Fixed: was output.shape
+    output = model(x_tensor)
+    print(f"Output tensor shape: {output.shape}")
+
+# Clear memory after execution
+clear_memory()
