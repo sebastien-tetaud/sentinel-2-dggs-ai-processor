@@ -302,7 +302,7 @@ def create_spherical_unet(in_channels, out_channels, features=[64, 128, 256, 512
         bilinear=bilinear
     )
 
-# Memory management function
+
 def clear_memory():
     """Clear GPU and CPU memory"""
     vars_to_delete = ['model', 'unet', 'x_tensor', 'output', 'x_multi_band', 'spectral_data', 'neighbor_indices']
@@ -400,6 +400,7 @@ def main():
 
     return unet, output
 
+
 def unet_test():
     """Quick test with minimal data"""
 
@@ -438,7 +439,5 @@ def unet_test():
     clear_memory()
 
 if __name__ == "__main__":
-
-    # Choose what to run:
 
     unet, output = main()
