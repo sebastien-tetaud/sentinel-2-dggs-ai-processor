@@ -1,4 +1,5 @@
 wandb/
+*.SAFE
 *.zarr
 results/
 # Byte-compiled / optimized / DLL files
