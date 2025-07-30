@@ -60,8 +60,79 @@ class NeighborIndexProcessor:
         self.cache.clear()
 
 class SphericalConv(nn.Module):
+    """
+    Spherical Convolution layer for HEALPix-organized Earth observation data.
+
+    This layer performs convolution operations on spherical data by processing 3×3
+    neighborhoods defined by HEALPix geometry. Unlike traditional CNNs that operate
+    on regular Euclidean grids, this implementation handles the irregular spatial
+    relationships inherent to spherical surfaces through externally computed neighbor
+    indices.
+
+    The core innovation is the separation of geometric processing (neighbor finding)
+    from neural computation (convolution), enabling flexible processing of arbitrary
+    HEALPix regions while maintaining computational efficiency through GPU parallelization.
+
+    Architecture:
+    - Uses 1D convolution with kernel_size=9 and stride=9
+    - Processes flattened 3×3 spherical patches (center + 8 neighbors = 9 values)
+    - Applies the same learned spatial filter to all patches simultaneously
+    - Maintains one-to-one correspondence: N input patches → N output features
+
+    Parameters
+    ----------
+    in_channels : int
+        Number of input channels (e.g., spectral bands in satellite imagery).
+    out_channels : int
+        Number of output feature channels to be learned by the convolution.
+    bias : bool, optional
+        If True, adds a learnable bias term to the convolution output. Default: True.
+
+    Attributes
+    ----------
+    conv : nn.Conv1d
+        1D convolution layer with kernel_size=9, stride=9 that processes flattened
+        spherical patches.
+
+    Notes
+    -----
+    - Requires externally computed neighbor_indices that define 3×3 spherical
+      neighborhoods for each spatial location
+    - All patches are processed in parallel for computational efficiency
+    - Output preserves spatial correspondence: output[i] corresponds to input patch[i]
+    - Handles device compatibility automatically (CPU/GPU synchronization)
+
+    Examples
+    --------
+    >>> # Initialize spherical convolution layer
+    >>> conv_layer = SphericalConv(in_channels=4, out_channels=64)
+    >>>
+    >>> # Input: [batch_size, channels, n_cells]
+    >>> x = torch.randn(1, 4, 10000)  # 1 batch, 4 bands, 10k HEALPix cells
+    >>>
+    >>> # Neighbor indices: [n_patches, 9] - precomputed 3×3 neighborhoods
+    >>> neighbor_indices = torch.randint(0, 10000, (5000, 9))  # 5k patches
+    >>>
+    >>> # Forward pass
+    >>> output = conv_layer(x, neighbor_indices)
+    >>> print(output.shape)  # [1, 64, 5000] - 64 features for 5k patches
+
+    Mathematical Operation
+    ----------------------
+    For each patch i with 9 cells [c₀, c₁, ..., c₈] and learned weights [w₀, w₁, ..., w₈]:
+
+        output[i] = Σⱼ(cⱼ × wⱼ) + bias
+
+    where c₀ is the center cell and c₁-c₈ are the 8 HEALPix neighbors.
+
+    See Also
+    --------
+    SphericalConvBlock : Spherical convolution with batch normalization and activation
+    SphericalDoubleConvBlock : Double spherical convolution block for U-Net architectures
+    NeighborIndexProcessor : Utility for computing HEALPix neighbor relationships
+    """
+
     def __init__(self, in_channels, out_channels, bias=True):
-        """Spherical Conv without fixed cell IDs"""
         super(SphericalConv, self).__init__()
 
         # Only the convolution layer - no neighbor processing
@@ -73,7 +144,57 @@ class SphericalConv(nn.Module):
             nn.init.constant_(self.conv.bias, 0.0)
 
     def forward(self, x, neighbor_indices):
-        """Forward pass with external neighbor indices"""
+        """
+        Perform spherical convolution on input data using precomputed neighbor indices.
+
+        This method extracts 3×3 spherical neighborhoods from the input tensor based on
+        the provided neighbor indices, then applies 1D convolution to process all patches
+        in parallel. Each patch represents a local spherical neighborhood where the
+        spatial relationships are defined by HEALPix geometry.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape [batch_size, in_channels, n_cells] containing
+            the data values for all HEALPix cells in the region.
+        neighbor_indices : torch.Tensor
+            Precomputed neighbor indices of shape [n_patches, 9] where each row
+            contains the data indices for one 3×3 spherical neighborhood. The first
+            index in each row is the center cell, followed by 8 neighbor indices.
+
+        Returns
+        -------
+        torch.Tensor
+            Output feature tensor of shape [batch_size, out_channels, n_patches]
+            where each spatial location corresponds to the convolution result for
+            one spherical patch.
+
+        Raises
+        ------
+        RuntimeError
+            If input tensor and neighbor_indices have incompatible devices.
+        IndexError
+            If neighbor_indices contain values outside the valid range [0, n_cells).
+
+        Notes
+        -----
+        Processing Pipeline:
+        1. Device synchronization: Move neighbor_indices to same device as input
+        2. Patch extraction: Extract all 3×3 neighborhoods simultaneously
+        3. Tensor reshaping: Flatten patches for 1D convolution processing
+        4. Convolution: Apply learned spatial filters to all patches in parallel
+
+        The patch extraction step uses advanced tensor indexing to efficiently
+        gather all required neighborhoods in a single operation, enabling
+        massive parallelization on GPU hardware.
+
+        Examples
+        --------
+        >>> conv = SphericalConv(in_channels=3, out_channels=16)
+        >>> x = torch.randn(2, 3, 1000)  # 2 batches, 3 channels, 1000 cells
+        >>> indices = torch.randint(0, 1000, (500, 9))  # 500 patches
+        >>> output = conv(x, indices)  # Shape: [2, 16, 500]
+        """
         batch_size, n_channels, n_cells = x.shape
 
         # Move neighbor_indices to same device as input
@@ -84,6 +205,13 @@ class SphericalConv(nn.Module):
         # Shape: [B, C_in, N_patches, 9]
         patches = x[:, :, neighbor_indices]
 
+        # Visualize some example patches
+        print(f"Example patches (first 3):")
+        for i in range(min(3, patches.shape[2])):
+            patch_data = patches[0, 0, i]  # First batch, first channel, patch i
+            patch_indices = neighbor_indices[i]
+            print(f"Patch {i}: indices {patch_indices[:3].cpu().numpy()}... → values {patch_data[:3].detach().cpu().numpy()}...")
+
         # Reshape to [B, C_in, N_patches * 9] for Conv1d
         patches_flat = patches.view(batch_size, n_channels, -1)
 
@@ -93,23 +221,136 @@ class SphericalConv(nn.Module):
         return output
 
 class SphericalConvBlock(nn.Module):
-    """Spherical conv block without fixed cell IDs"""
+    """
+    Spherical Convolution Block with batch normalization and ReLU activation.
+
+    This block combines spherical convolution with standard deep learning components
+    (batch normalization and ReLU activation) to create a robust building block for
+    spherical neural networks. It follows the widely-used pattern of Conv → BatchNorm → ReLU
+    that has proven effective in modern deep learning architectures.
+
+    Architecture:
+    - SphericalConv: Processes 3×3 spherical neighborhoods using HEALPix geometry
+    - BatchNorm1d: Normalizes feature distributions for stable training
+    - ReLU: Introduces non-linearity for learning complex spatial patterns
+
+    Parameters
+    ----------
+    in_channels : int
+        Number of input channels (e.g., spectral bands in satellite imagery).
+    out_channels : int
+        Number of output feature channels to be learned by the spherical convolution.
+
+    Attributes
+    ----------
+    conv : SphericalConv
+        Spherical convolution layer that processes 3×3 HEALPix neighborhoods.
+    bn : nn.BatchNorm1d
+        Batch normalization layer applied along the channel dimension.
+    relu : nn.ReLU
+        ReLU activation function with in-place operation for memory efficiency.
+
+    Notes
+    -----
+    - Batch normalization operates on the channel dimension, normalizing across
+      all spatial locations (patches) within each batch
+    - ReLU activation is applied in-place for memory efficiency
+    - The block preserves spatial correspondence: input patch i → output feature i
+    - Designed as a drop-in replacement for standard Conv2d blocks in CNNs
+
+    Processing Pipeline
+    -------------------
+    1. Spherical Convolution: Extract and process 3×3 spherical neighborhoods
+    2. Batch Normalization: Normalize feature distributions across spatial locations
+    3. ReLU Activation: Apply non-linear activation function
+
+    The batch normalization step is particularly important for spherical networks as
+    it helps stabilize training when processing irregular spatial arrangements and
+    varying neighborhood sizes that can occur at HEALPix boundaries.
+
+    See Also
+    --------
+    SphericalConv : Underlying spherical convolution operation
+    SphericalDoubleConvBlock : Double convolution block for U-Net architectures
+    SphericalUNet : Complete U-Net architecture using spherical convolution blocks
+    """
 
     def __init__(self, in_channels, out_channels):
         super(SphericalConvBlock, self).__init__()
 
         self.conv = SphericalConv(in_channels, out_channels)
         self.bn = nn.BatchNorm1d(out_channels)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU()
 
     def forward(self, x, neighbor_indices):
+        """
+        Forward pass through spherical convolution block.
+
+        Processes input through spherical convolution, batch normalization, and
+        ReLU activation in sequence. This creates normalized, non-linear feature
+        representations that are suitable for building deeper spherical networks.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape [batch_size, in_channels, n_cells] containing
+            the data values for all HEALPix cells in the region.
+        neighbor_indices : torch.Tensor
+            Precomputed neighbor indices of shape [n_patches, 9] defining 3×3
+            spherical neighborhoods for convolution processing.
+
+        Returns
+        -------
+        torch.Tensor
+            Output feature tensor of shape [batch_size, out_channels, n_patches]
+            containing normalized and activated features for each spherical patch.
+            All values are non-negative due to ReLU activation.
+
+        Notes
+        -----
+        The forward pass applies three sequential operations:
+
+        1. **Spherical Convolution**: Extracts spatial features from 3×3 HEALPix
+           neighborhoods using learned convolutional filters
+
+        2. **Batch Normalization**: Normalizes the feature distributions by:
+           - Computing mean and variance across spatial dimensions (patches)
+           - Applying learnable scale and shift parameters
+           - Improving training stability and convergence speed
+
+        3. **ReLU Activation**: Introduces non-linearity by setting negative
+           values to zero, enabling the network to learn complex spatial patterns
+
+        The batch normalization is particularly beneficial for spherical data as
+        it helps handle the irregular spatial arrangements and boundary effects
+        inherent in HEALPix tessellations.
+        """
         x = self.conv(x, neighbor_indices)
         x = self.bn(x)
         x = self.relu(x)
         return x
 
 class SphericalDoubleConvBlock(nn.Module):
-    """Double spherical conv block without fixed cell IDs"""
+    """
+    Double spherical convolution block for deeper feature extraction.
+
+    Applies two sequential spherical convolution blocks (Conv→BN→ReLU → Conv→BN→ReLU)
+    following the standard U-Net double convolution pattern. This design allows the
+    network to learn more complex spatial features within spherical neighborhoods.
+
+    Parameters
+    ----------
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels for both convolution blocks.
+
+    Notes
+    -----
+    Architecture: Input → SphericalConvBlock → SphericalConvBlock → Output
+    - First block: in_channels → out_channels
+    - Second block: out_channels → out_channels (refinement)
+    """
 
     def __init__(self, in_channels, out_channels):
         super(SphericalDoubleConvBlock, self).__init__()
@@ -118,12 +359,49 @@ class SphericalDoubleConvBlock(nn.Module):
         self.conv2 = SphericalConvBlock(out_channels, out_channels)
 
     def forward(self, x, neighbor_indices):
+        """
+        Apply double spherical convolution.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor [batch_size, in_channels, n_cells].
+        neighbor_indices : torch.Tensor
+            Precomputed neighbor indices [n_patches, 9].
+
+        Returns
+        -------
+        torch.Tensor
+            Output features [batch_size, out_channels, n_patches].
+        """
         x = self.conv1(x, neighbor_indices)
         x = self.conv2(x, neighbor_indices)
         return x
 
 class SphericalConvTranspose(nn.Module):
-    """Spherical transpose convolution for upsampling"""
+    """
+    Spherical transpose convolution for learnable upsampling in decoder paths.
+
+    Performs learned upsampling using 1D transpose convolution with the same
+    kernel and stride configuration as SphericalConv (kernel_size=9, stride=9).
+    Commonly used in U-Net decoder paths as an alternative to bilinear upsampling.
+
+    Parameters
+    ----------
+    in_channels : int
+        Number of input channels.
+    out_channels : int
+        Number of output channels after upsampling.
+    bias : bool, optional
+        Whether to include learnable bias term. Default: True.
+
+    Notes
+    -----
+    Architecture: Input → ConvTranspose1d → BatchNorm1d → ReLU → Output
+    - Uses same kernel_size=9 and stride=9 as forward spherical convolution
+    - Applies Kaiming initialization for stable training
+    - Note: neighbor_indices parameter is unused but maintained for API consistency
+    """
 
     def __init__(self, in_channels, out_channels, bias=True):
         super(SphericalConvTranspose, self).__init__()
@@ -144,7 +422,21 @@ class SphericalConvTranspose(nn.Module):
             nn.init.constant_(self.conv_transpose.bias, 0.0)
 
     def forward(self, x, neighbor_indices):
-        """Forward pass for transpose convolution"""
+        """
+        Apply transpose convolution for upsampling.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor [batch_size, in_channels, n_patches].
+        neighbor_indices : torch.Tensor
+            Unused parameter maintained for API consistency with other spherical layers.
+
+        Returns
+        -------
+        torch.Tensor
+            Upsampled output [batch_size, out_channels, n_patches_upsampled].
+        """
         x = self.conv_transpose(x)
         x = self.bn(x)
         x = self.relu(x)
