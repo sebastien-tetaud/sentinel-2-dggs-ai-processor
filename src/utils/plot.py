@@ -184,3 +184,41 @@ def plot_training_loss(
         plt.show()
 
     plt.close()
+
+
+def plot_all_chunks(data_tree, band, res, chunk_size_y, chunk_size_x, nb_chunks_y, nb_chunks_x, cmap="viridis", verbose= True, figsize_scale=3):
+    """
+    Plot all chunks of a given band and resolution.
+
+    Parameters:
+    - data_tree: xarray Dataset (e.g. dt.measurements.reflectance.r20m)
+    - band: str, band name (e.g. "b05")
+    - cmap: str, matplotlib colormap
+    - figsize_scale: int, scales the figure size (default is 3)
+    """
+    res_key = f"r{res}"
+    y_res = f"y_{res}"
+    x_res = f"x_{res}"
+    data_tree = data_tree.measurements.reflectance[res_key]
+    # Set up plot grid
+    fig, axes = plt.subplots(
+        nb_chunks_y, nb_chunks_x,
+        figsize=(figsize_scale * nb_chunks_x, figsize_scale * nb_chunks_y)
+    )
+
+    # Plot each chunk
+    for i in range(nb_chunks_y):
+        for j in range(nb_chunks_x):
+            ax = axes[i, j] if nb_chunks_y > 1 else axes[j]
+            y_start = i * chunk_size_y
+            x_start = j * chunk_size_x
+            chunk = data_tree[band].isel(
+                {y_res: slice(y_start, y_start + chunk_size_y),
+                 x_res: slice(x_start, x_start + chunk_size_x)}
+            ).load()
+            ax.imshow(chunk, cmap=cmap, vmin=0, vmax=1)
+            ax.set_title(f"Chunk ({i},{j})")
+            ax.axis("off")
+    if verbose:
+        plt.tight_layout()
+        plt.show()
