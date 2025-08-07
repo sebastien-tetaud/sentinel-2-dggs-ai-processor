@@ -295,7 +295,7 @@ class proj_odysea:
         return ds_total
 
 
-def healpix_projection(ds, level=19, chunk_size=4096):
+def healpix_projection(ds, utm_crs, level=19, chunk_size=4096):
     """
     Project Earth observation data from UTM coordinates to HEALPix spherical grid.
 
@@ -376,7 +376,7 @@ def healpix_projection(ds, level=19, chunk_size=4096):
     print(f"Y range: {y.min():.0f} to {y.max():.0f}")
 
     # 2. Transform UTM to lat/lon
-    utm_crs = "EPSG:32631"
+
     transformer = Transformer.from_crs(utm_crs, "EPSG:4326", always_xy=True)
     lon, lat = transformer.transform(xx, yy)
 
@@ -387,7 +387,7 @@ def healpix_projection(ds, level=19, chunk_size=4096):
 
     print(f"HEALPix Level {level} → {len(lidx):,} unique cells")
 
-    # 4. Project to HEALPix using your custom class
+    # 4. Project to HEALPix
     proj = proj_odysea(level, lidx, ilidx, nest=True, chunk_size=chunk_size)
     ds_healpix = proj.eval(ds.to_dataset())
 
